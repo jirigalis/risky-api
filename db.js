@@ -1,6 +1,8 @@
 var mysql = require('mysql');
 var pool;
 
+
+exports.superSecret = 'ilovescotchyscotch';
 exports.connect = function(done) {
 	pool = mysql.createPool({
 		connectionLimit : 10,

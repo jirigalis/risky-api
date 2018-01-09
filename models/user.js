@@ -26,6 +26,6 @@ exports.getById = function (userId, done) {
 exports.getByLogin = function (login, done) {
 	db.get().query('SELECT * FROM user WHERE login=?', login, function(err, rows) {
 		if (err) return done(err);
-		done(null, rows);
+		done(null, rows[0]);
 	})
 }
