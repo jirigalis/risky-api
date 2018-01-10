@@ -3,7 +3,7 @@ var express = require('express')
 	, User = require('../models/User')
 	;
 
-router.get('/users', (req, res) => {
+router.get('/', (req, res) => {
 	User.getAll(function(err, us)  {
 		res.json(us);
 	});
