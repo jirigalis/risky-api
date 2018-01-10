@@ -2,6 +2,7 @@ var express = require('express')
 	, router = express.Router()
 	, User = require('../models/User')
 	, jwt = require('jsonwebtoken')
+	, db = require('../db')
 	;
 
 router.post('/login', (req, res) => {
@@ -18,7 +19,7 @@ router.post('/login', (req, res) => {
 					admin: us.admin
 				};
 
-				var token = jwt.sign(payload, router.get('superSecret'), {
+				var token = jwt.sign(payload, db.superSecret, {
 					expiresIn: '20d' //expires in 24 hours
 				});
 

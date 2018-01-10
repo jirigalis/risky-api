@@ -1,14 +1,18 @@
 const express = require('express')
 const app = express()
 var db = require('./db')
-app.set('superSecret', db.superSecret);
 var bodyParser = require('body-parser');
 var morgan = require('morgan');
 var routes = require('./controllers/index');
 
-var birds = require('./birds')
-var User = require('./models/user');
-
+db.connect(function (err) {
+	if (err) {
+		console.log('Unable to connect to database.');
+		console.log(err);
+		process.exit(1);
+	} else {
+	}
+})
 //set super secret
 app.set('superSecret', db.superSecret);
 
@@ -19,21 +23,9 @@ app.use(bodyParser.json());
 //log request
 app.use(morgan('dev'));
 
-
 //routing
 app.use(routes);
 
+app.listen(3000, () => console.log('Listening on port 3000...'))		
 
 
-
-app.get('/', (req, res) => {
-	res.send('Hello Wolrd!');
-})
-
-app.get('/users', (req, res) => {
-	User.getAll(function(err, us)  {
-		res.json(us);
-	});
-})
-
-app.use('/birds', birds);
