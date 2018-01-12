@@ -1,9 +1,9 @@
 const express = require('express')
 const app = express()
 var db = require('./db')
-var bodyParser = require('body-parser');
 var morgan = require('morgan');
 var routes = require('./controllers/index');
+var expressSanitizer = require('express-sanitizer');
 
 db.connect(function (err) {
 	if (err) {
@@ -16,9 +16,10 @@ db.connect(function (err) {
 //set super secret
 app.set('superSecret', db.superSecret);
 
-// use body parser so we can get info from POST and/or URL parameters
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(bodyParser.json());
+// use parser so we can get info from POST and/or URL parameters
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(expressSanitizer());
 
 //log request
 app.use(morgan('dev'));

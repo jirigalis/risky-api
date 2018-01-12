@@ -12,7 +12,14 @@ exports.connect = function(done) {
 	})
 
 
-	pool.getConnection(function (err, connection) { console.log("Connected to DB") });
+	pool.getConnection(function (err, connection) {
+		console.log("Connected to DB")
+		connection.on('error', err => {
+			console.log("---------------------------------------");
+			console.log(err);
+			console.log("---------------------------------------");
+		})
+	});
 
 	done()
 }

@@ -4,6 +4,7 @@ var express = require('express')
 	, users = require('./users')
 	, topics = require('./topics')
 	, auth = require('../middleware/auth')
+	, errorHandler = require('../middleware/errorHandler')
 	;
 
 router.use(login);
@@ -15,5 +16,7 @@ router.use('/topics', topics);
 router.get('/', (req, res) => {
 	res.send('Hello Wolrd!');
 })
+
+router.use(errorHandler);
 
 module.exports = router;

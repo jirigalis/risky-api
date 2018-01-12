@@ -104,8 +104,9 @@ CREATE TABLE `topic` (
   `id` int(10) NOT NULL AUTO_INCREMENT,
   `name` varchar(100) NOT NULL,
   `description` varchar(100) DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8;
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `topic_un` (`name`)
+) ENGINE=InnoDB AUTO_INCREMENT=44 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -114,7 +115,7 @@ CREATE TABLE `topic` (
 
 LOCK TABLES `topic` WRITE;
 /*!40000 ALTER TABLE `topic` DISABLE KEYS */;
-INSERT INTO `topic` VALUES (1,'Savci','Otázky na téma Savci'),(2,'Ptáci','Otázky na téma Ptáci'),(3,'Ryby, obojživelníci a plazi',NULL),(4,'Bezobratlí',NULL),(5,'Rostliny',NULL),(6,'Stromy, keře',NULL);
+INSERT INTO `topic` VALUES (1,'Savci','Otázky na téma Savci'),(2,'Ptáci','Otázky na téma Ptáci'),(3,'Ryby, obojživelníci a plazi',NULL),(4,'Bezobratlí',NULL),(5,'Rostliny',NULL),(6,'Stromy, keře',NULL),(7,'Hvězdná obloha','Otázky na téma Hvězdná obloha'),(43,'KPČ','Kulturní a památková činnost');
 /*!40000 ALTER TABLE `topic` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -158,4 +159,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2018-01-10 16:09:01
+-- Dump completed on 2018-01-12 13:27:03

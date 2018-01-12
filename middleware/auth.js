@@ -4,7 +4,7 @@ var jwt = require('jsonwebtoken');
 var User = require('../models/user');
 
 module.exports = function(req, res, next) {
-	var token = req.body.token || req.query.token || req.headers['x-access-token'];
+	var token = req.token || req.token || req.headers['x-access-token'];
 	if (token) {
 		jwt.verify(token, 'ilovescotchyscotch', function(err, decoded) {
 			if (err) {
