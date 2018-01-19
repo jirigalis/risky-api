@@ -5,18 +5,19 @@ var errors = require('../helpers/errors')
 
 var Topic = require('../models/Topic')
 
-router.use(function timeLog (req, res, next) {
-	console.log('Time: ', Date.now())
-	next();
-});
-
 router.get('/', function (req, res) {
 	Topic.getAll(function(err, us)  {
 		res.json(us);
 	});
 })
 
-router.post('/create', function (req, res, next) {
+router.post('/create', createTopic);
+router.put('/update/:id', updateTopic);
+router.delete('/delete/:id', deleteTopic);
+
+module.exports = router;
+
+function createTopic(req, res, next) {
 	let newTopic = req.body;
 	newTopic.name = req.sanitize(newTopic.name);
 	newTopic.description = req.sanitize(newTopic.description);
@@ -29,7 +30,26 @@ router.post('/create', function (req, res, next) {
 			res.json(topic)
 		});
 	}
+}
 
-})
+function updateTopic(req, res, next) {
+	let topic = {
+		id: req.params.id,
+		name: req.sanitize(req.body.name),
+		description: req.sanitize(req.body.description)
+	}
 
-module.exports = router;
+	if(utils.isNullOrEmpty(topic.name)) {
+		next(errors.NULL_OR_EMPTY('name'));
+	} else {
+		Topic.update(topic, (err, updatedTopic) => {
+			res.json(updatedTopic);
+		});
+	}
+}
+
+function deleteTopic(req, res, next) {
+	Topic.delete(req.params.id, (err, deleted) => {
+		res.json(deleted);
+	});
+}

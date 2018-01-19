@@ -23,8 +23,23 @@ exports.getByName = (name, done) => {
 }
 
 exports.getByID = (id, done) => {
+	console.log(id);
 	db.get().query('SELECT * FROM topic WHERE id='+id, (err, rows) => {
 		if (err) throw err;
 		done(null, rows[0]);
 	});
+}
+
+exports.update = (topic, done) => {
+	var values = [topic.name, topic.description, topic.id];
+	db.get().query('UPDATE topic SET name = ?, description = ? WHERE id = ?', values, (err, result) => {
+		if (err) throw err;
+		done(null, result.affectedRows);
+	})
+}
+exports.delete = (id, done) => {
+	db.get().query('DELETE FROM topic WHERE id=?',[id], (err, result) => {
+		if (err) throw err;
+		done(null, result.affectedRows);
+	})
 }

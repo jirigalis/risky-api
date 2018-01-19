@@ -16,6 +16,141 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
+-- Table structure for table `answer`
+--
+
+DROP TABLE IF EXISTS `answer`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `answer` (
+  `id` int(10) NOT NULL AUTO_INCREMENT,
+  `event_id` int(10) NOT NULL,
+  `question_id` int(10) NOT NULL,
+  `competitor_id` int(10) NOT NULL,
+  `correct` tinyint(1) NOT NULL DEFAULT '0',
+  `created` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `answer_event_fk` (`event_id`),
+  KEY `answer_question_fk` (`question_id`),
+  KEY `answer_competitor_fk` (`competitor_id`),
+  CONSTRAINT `answer_competitor_fk` FOREIGN KEY (`competitor_id`) REFERENCES `competitor` (`id`),
+  CONSTRAINT `answer_event_fk` FOREIGN KEY (`event_id`) REFERENCES `event` (`id`),
+  CONSTRAINT `answer_question_fk` FOREIGN KEY (`question_id`) REFERENCES `question` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `answer`
+--
+
+LOCK TABLES `answer` WRITE;
+/*!40000 ALTER TABLE `answer` DISABLE KEYS */;
+/*!40000 ALTER TABLE `answer` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `competitor`
+--
+
+DROP TABLE IF EXISTS `competitor`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `competitor` (
+  `id` int(10) NOT NULL AUTO_INCREMENT,
+  `name` varchar(100) NOT NULL,
+  `created` int(11) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `competitor`
+--
+
+LOCK TABLES `competitor` WRITE;
+/*!40000 ALTER TABLE `competitor` DISABLE KEYS */;
+/*!40000 ALTER TABLE `competitor` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `event`
+--
+
+DROP TABLE IF EXISTS `event`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `event` (
+  `id` int(10) NOT NULL AUTO_INCREMENT,
+  `author` int(10) NOT NULL,
+  `created` int(11) NOT NULL,
+  `updated` int(11) NOT NULL,
+  `state` varchar(20) NOT NULL DEFAULT 'CREATED',
+  PRIMARY KEY (`id`),
+  CONSTRAINT `event_user_fk` FOREIGN KEY (`id`) REFERENCES `user` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `event`
+--
+
+LOCK TABLES `event` WRITE;
+/*!40000 ALTER TABLE `event` DISABLE KEYS */;
+/*!40000 ALTER TABLE `event` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `event_competitor`
+--
+
+DROP TABLE IF EXISTS `event_competitor`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `event_competitor` (
+  `event_id` int(10) NOT NULL,
+  `competitor_id` int(10) NOT NULL,
+  KEY `event_competitor_competitor_fk` (`event_id`),
+  CONSTRAINT `event_competitor_competitor_fk` FOREIGN KEY (`event_id`) REFERENCES `competitor` (`id`),
+  CONSTRAINT `event_competitor_event_fk` FOREIGN KEY (`event_id`) REFERENCES `event` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `event_competitor`
+--
+
+LOCK TABLES `event_competitor` WRITE;
+/*!40000 ALTER TABLE `event_competitor` DISABLE KEYS */;
+/*!40000 ALTER TABLE `event_competitor` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `event_question`
+--
+
+DROP TABLE IF EXISTS `event_question`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `event_question` (
+  `event_id` int(10) NOT NULL,
+  `question_id` int(10) NOT NULL,
+  KEY `event_question_question_fk` (`question_id`),
+  KEY `event_question_event_fk` (`event_id`),
+  CONSTRAINT `event_question_event_fk` FOREIGN KEY (`event_id`) REFERENCES `event` (`id`),
+  CONSTRAINT `event_question_question_fk` FOREIGN KEY (`question_id`) REFERENCES `question` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `event_question`
+--
+
+LOCK TABLES `event_question` WRITE;
+/*!40000 ALTER TABLE `event_question` DISABLE KEYS */;
+/*!40000 ALTER TABLE `event_question` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `level`
 --
 
@@ -106,7 +241,7 @@ CREATE TABLE `topic` (
   `description` varchar(100) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `topic_un` (`name`)
-) ENGINE=InnoDB AUTO_INCREMENT=44 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=46 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -115,7 +250,7 @@ CREATE TABLE `topic` (
 
 LOCK TABLES `topic` WRITE;
 /*!40000 ALTER TABLE `topic` DISABLE KEYS */;
-INSERT INTO `topic` VALUES (1,'Savci','Otázky na téma Savci'),(2,'Ptáci','Otázky na téma Ptáci'),(3,'Ryby, obojživelníci a plazi',NULL),(4,'Bezobratlí',NULL),(5,'Rostliny',NULL),(6,'Stromy, keře',NULL),(7,'Hvězdná obloha','Otázky na téma Hvězdná obloha'),(43,'KPČ','Kulturní a památková činnost');
+INSERT INTO `topic` VALUES (1,'Savci','Otázky na téma Savci'),(2,'Ptáci','Otázky na téma Ptáci'),(3,'Ryby, obojživelníci a plazi',NULL),(4,'Bezobratlí',NULL),(5,'Rostliny','Otázky na téma Rostliny'),(6,'Stromy, keře',NULL),(7,'Hvězdná obloha','Otázky na téma Hvězdná obloha'),(43,'KPČ','Kulturní a památková činnost');
 /*!40000 ALTER TABLE `topic` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -159,4 +294,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2018-01-12 13:27:03
+-- Dump completed on 2018-01-19 13:57:00
