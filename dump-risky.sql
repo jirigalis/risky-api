@@ -197,7 +197,7 @@ CREATE TABLE `question` (
 
 LOCK TABLES `question` WRITE;
 /*!40000 ALTER TABLE `question` DISABLE KEYS */;
-INSERT INTO `question` VALUES (1,'Popište základní rozdíly mezi zajícem polním a králíkem divokým.',1,NULL),(2,'Jmenujte alespoň dvě dravé ryby, které žijí v našich vodách.',2,NULL),(3,'Na území národního parku Podyjí žije jediný druh želvy u nás. O jaký druh se jedná?',5,NULL),(4,'Patří želva mezi obojživelníky a nebo plazy?',2,NULL);
+INSERT INTO `question` VALUES (1,'Popište základní rozdíly mezi zajícem polním a Králíkem divokým.',1,NULL),(2,'Jmenujte alespoň dvě dravé ryby, které žijí v našich vodách.',2,NULL),(3,'Na území národního parku Podyjí žije jediný druh želvy u nás. O jaký druh se jedná?',5,NULL),(4,'Patří želva mezi obojživelníky a nebo plazy?',2,NULL);
 /*!40000 ALTER TABLE `question` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -224,7 +224,7 @@ CREATE TABLE `question_topic` (
 
 LOCK TABLES `question_topic` WRITE;
 /*!40000 ALTER TABLE `question_topic` DISABLE KEYS */;
-INSERT INTO `question_topic` VALUES (1,1),(2,3),(3,3),(4,3);
+INSERT INTO `question_topic` VALUES (2,3),(3,3),(4,3),(2,44),(3,44),(4,44),(1,1),(1,44);
 /*!40000 ALTER TABLE `question_topic` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -241,7 +241,7 @@ CREATE TABLE `topic` (
   `description` varchar(100) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `topic_un` (`name`)
-) ENGINE=InnoDB AUTO_INCREMENT=46 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=45 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -250,7 +250,7 @@ CREATE TABLE `topic` (
 
 LOCK TABLES `topic` WRITE;
 /*!40000 ALTER TABLE `topic` DISABLE KEYS */;
-INSERT INTO `topic` VALUES (1,'Savci','Otázky na téma Savci'),(2,'Ptáci','Otázky na téma Ptáci'),(3,'Ryby, obojživelníci a plazi',NULL),(4,'Bezobratlí',NULL),(5,'Rostliny','Otázky na téma Rostliny'),(6,'Stromy, keře',NULL),(7,'Hvězdná obloha','Otázky na téma Hvězdná obloha'),(43,'KPČ','Kulturní a památková činnost');
+INSERT INTO `topic` VALUES (1,'Savci','Otázky na téma Savci'),(2,'Ptáci','Otázky na téma Ptáci'),(3,'Ryby, obojživelníci a plazi',NULL),(4,'Bezobratlí',NULL),(5,'Rostliny','Otázky na téma Rostliny'),(6,'Stromy, keře',NULL),(7,'Hvězdná obloha','Otázky na téma Hvězdná obloha'),(43,'KPČ','Kulturní a památková činnost'),(44,'Zvířata','Otázky na téma zvířata');
 /*!40000 ALTER TABLE `topic` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -294,4 +294,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2018-01-19 13:57:00
+-- Dump completed on 2018-01-23 17:32:47

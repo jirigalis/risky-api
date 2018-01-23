@@ -1,4 +1,4 @@
-var mysql = require('mysql');
+var mysql = require('promise-mysql');
 var pool;
 
 exports.superSecret = 'ilovescotchyscotch';

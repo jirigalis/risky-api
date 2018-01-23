@@ -1,3 +1,5 @@
+global._ = require('lodash');
+
 const express = require('express')
 const app = express()
 var db = require('./db')
