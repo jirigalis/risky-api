@@ -7,7 +7,8 @@ var Question = require('../models/Question')
 
 router.get('/', getAll);
 router.get('/:id', getByID);
-router.get('/topic/:id', getByTopicID);
+router.get('/topic/:id', getAllByTopicID);
+router.get('/topic/:id/random', getRandomByTopic)
 router.put('/:id', update);
 
 module.exports = router
@@ -24,9 +25,15 @@ function getByID(req, res, next) {
 	})
 }
 
-function getByTopicID(req, res, next) {
-	Question.getByTopicID(req.params.id, (err, questions) => {
+function getAllByTopicID(req, res, next) {
+	Question.getAllByTopicID(req.params.id, (err, questions) => {
 		res.json(questions);
+	})
+}
+
+function getRandomByTopic(req, res, next) {
+	Question.getRandomByTopic(req.params.id, (err, question) => {
+		res.json(question);
 	})
 }
 

@@ -49,13 +49,12 @@ exports.getByID = (qID, done) => {
 			return done(null, errors.ID_NOT_FOUND(qID));
 		}
 		const topics = await fetchTopicsByQuestionID(questions[0].id);
-		console.log(topics);
 		questions[0].topics = topics;
 		return done(null, questions[0]);
 	})
 }
 
-exports.getByTopicID = (tID, done) => {
+exports.getAllByTopicID = (tID, done) => {
 	db.get().query('SELEcT q.* FROM question q INNER JOIN question_topic qt ON q.id=qt.question_id WHERE qt.topic_id='+tID+
 		' GROUP BY q.id', async (err, questions) => {
 			if (err) throw err;
@@ -69,6 +68,20 @@ exports.getByTopicID = (tID, done) => {
 			}
 			return done(null, questions);
 		});
+}
+
+exports.getRandomByTopic = (tID, done) => {
+	db.get().query('SELEcT q.* FROM question q INNER JOIN question_topic qt ON q.id=qt.question_id'+
+		' WHERE qt.topic_id = '+tID+' ORDER BY RAND() LIMIT 1', async (err, question) => {
+			if (err) throw err;
+			if (question.length === 0) {
+				return done(null, errors.ID_NOT_FOUND(tID));
+			}
+
+			const topics = await fetchTopicsByQuestionID(question[0].id);
+			question[0].topics = topics;
+			return done(null, question[0]);
+		})
 }
 
 async function fetchTopicsByQuestionID(qID) {

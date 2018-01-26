@@ -1,4 +1,7 @@
 global._ = require('lodash');
+global.moment = require('moment');
+global.errors = require('./helpers/errors');
+global.utils = require('./helpers/utils');
 
 const express = require('express')
 const app = express()
