@@ -20,12 +20,13 @@ router.post('/login', (req, res) => {
 				};
 
 				var token = jwt.sign(payload, db.superSecret, {
-					expiresIn: '20d' //expires in 24 hours
+					expiresIn: '20d' //expires in 20 days
 				});
 
 				res.json({
 					success: true,
 					message: "Token is here",
+					user: us,
 					token: token
 				});
 			}

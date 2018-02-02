@@ -6,6 +6,9 @@ var Event = require('../models/Event')
 router.get('/', getAll);
 router.get('/:id', getByID);
 
+
+module.exports = router
+
 function getAll(req, res, next) {
 	Event.getAll((err, events) => {
 		res.json(events);
