@@ -29,11 +29,3 @@ function create(event, done) {
 	})
 }
 
-function update() {
-
-}
-
-function delete() {
-
-}
-
