@@ -3,7 +3,6 @@ var db = require('../db.js');
 exports.getAll = getAll;
 exports.getByID = getByID;
 
-
 function getAll(done) {
 	db.get().query('SELECT * FROM event', (err, events) => {
 		if (err) throw err;
