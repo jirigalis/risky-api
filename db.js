@@ -6,8 +6,8 @@ exports.connect = function(done) {
 	pool = mysql.createPool({
 		connectionLimit : 10,
 		host: 'localhost',
-		user: 'jgalis',
-		password: 'root',
+		user: 'root',
+		password: '',
 		database: 'risky'
 	})
 

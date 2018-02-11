@@ -5,6 +5,7 @@ var express = require('express')
 	, topics = require('./topics')
 	, questions = require('./questions')
 	, events = require('./events')
+	, levels = require('./levels')
 	, auth = require('../middleware/auth')
 	, errorHandler = require('../middleware/errorHandler')
 	;
@@ -16,6 +17,7 @@ router.use('/users', users);
 router.use('/topics', topics);
 router.use('/questions', questions);
 router.use('/events', events);
+router.use('/levels', levels);
 
 router.get('/', (req, res) => {
 	res.send('Hello Wolrd!');

@@ -43,3 +43,15 @@ exports.delete = (id, done) => {
 		done(null, result.affectedRows);
 	})
 }
+
+exports.getByQuestionId = (qID, done) => {
+	db.get().query('SELECT * from topic WHERE id in (SELECT topic_id FROM question_topic'+
+	' WHERE question_id='+qID+')', (err, topics) => {
+		if (err) throw err;
+		console.log(topics);
+		if (topics.length === 0) {
+			return done(null, errors.ID_NOT_FOUND(qID));
+		}
+		return done(null, topics);
+	})
+}

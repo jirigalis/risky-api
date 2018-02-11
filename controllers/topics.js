@@ -9,6 +9,7 @@ router.get('/', function (req, res) {
 	});
 })
 
+router.get('/question/:id', getByQuestionId);
 router.post('/create', createTopic);
 router.put('/update/:id', updateTopic);
 router.delete('/delete/:id', deleteTopic);
@@ -49,5 +50,11 @@ function updateTopic(req, res, next) {
 function deleteTopic(req, res, next) {
 	Topic.delete(req.params.id, (err, deleted) => {
 		res.json(deleted);
+	});
+}
+
+function getByQuestionId(req, res, next) {
+	Topic.getByQuestionId(req.params.id, (err, topics) => {
+		res.json(topics);
 	});
 }

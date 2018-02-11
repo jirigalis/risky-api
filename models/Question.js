@@ -84,6 +84,17 @@ exports.getRandomByTopic = (tID, done) => {
 		})
 }
 
+exports.getTopics = (qID, done) => {
+	db.get().query('SELECT * from topic WHERE id in (SELECT topic_id FROM question_topic'+
+		' WHERE question_id='+qID+')', (err, topics) => {
+			if (err) throw err;
+			if (topics.length === 0) {
+				return done(null, errors.ID_NOT_FOUND(qID));
+			}
+			return done(null, topics);
+		})
+}
+
 async function fetchTopicsByQuestionID(qID) {
 	let topics = await Promise.resolve(db.get().query('SELECT topic_id from question_topic WHERE question_id='+qID));
 	return _.map(topics, 'topic_id');

@@ -6,14 +6,19 @@ var express = require('express')
 	;
 
 router.post('/login', (req, res) => {
+	console.log(req.body.login, req.body.password);
+	if (!(req.body.login && req.body.password)) {
+		res.status(403).send(errors.MISSING_CREDENTIALS);
+		return;
+	}
 	User.getByLogin(req.body.login, (err, us) => {
 		if (err) throw err;
 
 		if (!us) {
-			res.json({ success: false, message: 'Authentication failed. User not found.' });
+			res.json({ success: false, message: errors.WRONG_CREDENTIALS });
 		} else if (us) {
 			if (us.password != req.body.password) {
-				res.json({ success: false, message: 'Authentication failed. Wrong password.' })
+				res.json({ success: false, message: errors.WRONG_CREDENTIALS })
 			} else {
 				const payload = {
 					admin: us.admin
