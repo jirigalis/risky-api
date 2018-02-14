@@ -5,9 +5,11 @@ exports.create = (question, done) => {
 	var questionValues = [question.text, question.level, question.attachment];
 	db.get().query('INSERT INTO question (text, level, attachment) VALUES (?, ?, ?)', questionValues, (err, res) => {
 		if (err) throw err;
-		db.get().query('INSERT INTO question_topic VALUES ('+res.insertId+', '+question.topic+')', (err2, res2) => {
-			if (err) throw err2;			
-		})
+		//handle topics
+		question.topics = _.map(question.topics, parseFloat)
+		for (var i = 0; i < question.topics.length; i++) {
+			db.get().query('INSERT INTO question_topic VALUES ('+res.insertId+', '+question.topics[i]+')');
+		}
 		return done(null, res.insertId)
 	});
 }

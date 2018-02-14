@@ -6,6 +6,7 @@ var errors = require('../helpers/errors')
 var Question = require('../models/Question')
 
 router.get('/', getAll);
+router.post('/new', create);
 router.get('/:id', getByID);
 router.get('/topic/:id', getAllByTopicID);
 router.get('/topic/:id/random', getRandomByTopic)
@@ -43,13 +44,24 @@ function getTopics(req, res, next) {
 		res.json(topics);
 	})
 }
+function create(req, res, next) {
+	let question = {
+		text: req.sanitize(req.body.text),
+		level: req.body.level,
+		attachment: req.body.attachment,
+		topics: req.body.topics
+	}
+	Question.create(question, (err, question) => {
+		res.json(question);
+	})
+}
 
 function update(req, res, next) {
 	let question = {
 		id: req.params.id,
 		text: req.sanitize(req.body.text),
 		level: req.body.level,
-		attachment: req.sanitize(req.body.attachment),
+		attachment: req.body.attachment,
 		topics: req.body.topics
 	}
 	Question.update(question, (err, affectedRows) => {
