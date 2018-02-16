@@ -9,12 +9,19 @@ router.get('/', function (req, res) {
 	});
 })
 
+router.get('/:id', getById);
 router.get('/question/:id', getByQuestionId);
-router.post('/create', createTopic);
-router.put('/update/:id', updateTopic);
+router.post('/new', createTopic);
+router.put('/:id', updateTopic);
 router.delete('/delete/:id', deleteTopic);
 
 module.exports = router;
+
+function getById(req, res, next) {
+	Topic.getByID(req.params.id, (err, topic) => {
+		res.json(topic);
+	})
+}
 
 function createTopic(req, res, next) {
 	let newTopic = req.body;
