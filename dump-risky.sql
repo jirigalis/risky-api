@@ -59,8 +59,9 @@ CREATE TABLE `competitor` (
   `id` int(10) NOT NULL AUTO_INCREMENT,
   `name` varchar(100) NOT NULL,
   `created` int(11) NOT NULL,
+  `note` varchar(2000) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -69,6 +70,7 @@ CREATE TABLE `competitor` (
 
 LOCK TABLES `competitor` WRITE;
 /*!40000 ALTER TABLE `competitor` DISABLE KEYS */;
+INSERT INTO `competitor` VALUES (1,'First competitor',1519147722,'This is the very beginning of all competitors!'),(2,'Second competitor',1519147735,'Desc');
 /*!40000 ALTER TABLE `competitor` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -212,10 +214,10 @@ DROP TABLE IF EXISTS `question_topic`;
 CREATE TABLE `question_topic` (
   `question_id` int(10) NOT NULL,
   `topic_id` int(10) NOT NULL,
-  KEY `question_topic_question_fk` (`question_id`),
   KEY `question_topic_topic_fk` (`topic_id`),
-  CONSTRAINT `question_topic_question_fk` FOREIGN KEY (`question_id`) REFERENCES `question` (`id`),
-  CONSTRAINT `question_topic_topic_fk` FOREIGN KEY (`topic_id`) REFERENCES `topic` (`id`)
+  KEY `question_topic_question_fk` (`question_id`),
+  CONSTRAINT `question_topic_question_fk` FOREIGN KEY (`question_id`) REFERENCES `question` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `question_topic_topic_fk` FOREIGN KEY (`topic_id`) REFERENCES `topic` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -225,7 +227,7 @@ CREATE TABLE `question_topic` (
 
 LOCK TABLES `question_topic` WRITE;
 /*!40000 ALTER TABLE `question_topic` DISABLE KEYS */;
-INSERT INTO `question_topic` VALUES (2,3),(3,3),(4,3),(2,44),(3,44),(4,44),(1,1),(1,44),(5,2),(5,7),(9,2),(9,44),(10,43),(11,4);
+INSERT INTO `question_topic` VALUES (2,3),(3,3),(4,3),(2,44),(3,44),(4,44),(1,1),(1,44),(5,2),(5,7),(9,2),(9,44),(10,43),(11,46);
 /*!40000 ALTER TABLE `question_topic` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -242,7 +244,7 @@ CREATE TABLE `topic` (
   `description` varchar(100) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `topic_un` (`name`)
-) ENGINE=InnoDB AUTO_INCREMENT=46 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=47 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -251,7 +253,7 @@ CREATE TABLE `topic` (
 
 LOCK TABLES `topic` WRITE;
 /*!40000 ALTER TABLE `topic` DISABLE KEYS */;
-INSERT INTO `topic` VALUES (1,'Savci','Otázky na téma Savci'),(2,'Ptáci','Otázky na téma Ptáci'),(3,'Ryby, obojživelníci a plazi',NULL),(4,'Bezobratlí','test'),(5,'Rostliny','Otázky na téma Rostliny'),(6,'Stromy, keře',NULL),(7,'Hvězdná obloha','Otázky na téma Hvězdná obloha'),(43,'KPČ','Kulturní a památková činnost'),(44,'Zvířata','Otázky na téma zvířata'),(45,'Stopy','Stopy zvířat');
+INSERT INTO `topic` VALUES (1,'Savci','Otázky na téma Savci'),(2,'Ptáci','Otázky na téma Ptáci'),(3,'Ryby, obojživelníci a plazi',NULL),(5,'Rostliny','Otázky na téma Rostliny'),(6,'Stromy, keře',NULL),(7,'Hvězdná obloha','Otázky na téma Hvězdná obloha'),(43,'KPČ','Kulturní a památková činnost'),(44,'Zvířata','Otázky na téma zvířata'),(45,'Stopy','Stopy zvířat'),(46,'Bezobratlí','Otázky na téma bezobratlí');
 /*!40000 ALTER TABLE `topic` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -295,4 +297,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2018-02-16 14:03:20
+-- Dump completed on 2018-02-20 18:39:21
