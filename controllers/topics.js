@@ -56,6 +56,10 @@ function updateTopic(req, res, next) {
 
 function deleteTopic(req, res, next) {
 	Topic.delete(req.params.id, (err, deleted) => {
+		if (err) {
+			res.status(500);
+			next(err);
+		}
 		res.json(deleted);
 	});
 }
