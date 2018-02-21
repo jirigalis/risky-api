@@ -12,6 +12,7 @@ router.get('/', function (req, res) {
 router.get('/:id', getById);
 router.post('/new', createCompetitor);
 router.put('/:id', updateCompetitor);
+router.delete('/delete/:id', deleteCompetitor);
 
 function getById(req, res, next) {
 	Competitor.getByID(req.params.id, (err, competitor) => {
@@ -52,6 +53,16 @@ function updateCompetitor(req, res, next) {
 			res.json(updatedCompetitor);
 		});
 	}
+}
+
+function deleteCompetitor(req, res, next) {
+	Competitor.delete(req.params.id, (err, deleted) => {
+		if (err) {
+			res.status(500);
+			next(err);
+		}
+		res.json(deleted);
+	});
 }
 
 module.exports = router;

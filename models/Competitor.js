@@ -15,7 +15,6 @@ exports.getByID = (id, done) => {
 
 exports.create = function(competitor, done) {
 	var values = [competitor.name, moment().unix(), competitor.note];
-	console.log(values);
 	db.get().query('INSERT INTO competitor (name, created, note) VALUES (?, ?, ?)', values, function (err, result) {
 		if (err) {done(err, err);}
 		done(null, result.insertId)
@@ -26,6 +25,13 @@ exports.update = (competitor, done) => {
 	var values = [competitor.name, competitor.note, competitor.id];
 	db.get().query('UPDATE competitor SET name = ?, note = ? WHERE id = ?', values, (err, result) => {
 		if (err) done(err, err);
+		done(null, result.affectedRows);
+	})
+}
+
+exports.delete = (id, done) => {
+	db.get().query('DELETE FROM competitor WHERE id=?',[id], (err, result) => {
+		if (err) { return done(err, err) };
 		done(null, result.affectedRows);
 	})
 }
