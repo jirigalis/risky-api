@@ -61,7 +61,7 @@ CREATE TABLE `competitor` (
   `created` int(11) NOT NULL,
   `note` varchar(2000) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -70,7 +70,7 @@ CREATE TABLE `competitor` (
 
 LOCK TABLES `competitor` WRITE;
 /*!40000 ALTER TABLE `competitor` DISABLE KEYS */;
-INSERT INTO `competitor` VALUES (1,'First competitor',1519147722,'This is the very beginning of all competitors!'),(2,'Second competitor',1519147735,'Desc');
+INSERT INTO `competitor` VALUES (1,'First competitor',1519147722,'This is the very beginning of all competitors!'),(3,'Second competitor',1519217391,'Test desc');
 /*!40000 ALTER TABLE `competitor` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -297,4 +297,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2018-02-20 18:39:21
+-- Dump completed on 2018-02-23 13:44:54
