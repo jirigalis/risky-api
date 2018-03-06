@@ -101,3 +101,15 @@ async function fetchTopicsByQuestionID(qID) {
 	let topics = await Promise.resolve(db.get().query('SELECT topic_id from question_topic WHERE question_id='+qID));
 	return _.map(topics, 'topic_id');
 }
+
+exports._getRandomQuestionByTopic = (tID, done) => {
+	db.get().query('SELEcT q.id FROM question q INNER JOIN question_topic qt ON q.id=qt.question_id'+
+		' WHERE qt.topic_id = '+tID+' ORDER BY RAND() LIMIT 1', (err, question) => {
+			if (err) {
+				return done(null, err);
+			}
+			else {
+				return done(question, null);
+			}
+		})
+}

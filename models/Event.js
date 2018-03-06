@@ -1,4 +1,5 @@
 var db = require('../db.js');
+var Question = require('../models/Question');
 
 exports.getAll = getAll;
 exports.getByID = getByID;
@@ -24,24 +25,36 @@ function getByID(id, done) {
 
 function create(event, done) {
 	var eventValues = [event.author, event.created, event.updated, event.state];
-	db.get().query('INSERT INTO evsent (author, created, updated, state) VALUES (?,?,?,?)', eventValues, (err, res) => {
+	event.questions = [];
+
+	Question._getRandomQuestionByTopic(3, (question, err) => {
+		event.questions.push(question[0].id)
+	});
+		
+
+	db.get().query('INSERT INTO event (author, created, updated, state) VALUES (?,?,?,?)', eventValues, (err, res) => {
 		if (err) return done(err, null);
 		
 		const id = res.insertId;
 
 		//insert competitors
-		/*_.forEach(event.competitors, c => {
+		_.forEach(event.competitors, c => {
 			db.get().query('INSERT INTO event_competitor (event_id, competitor_id) VALUES (?, ?)', [id, c], (err, res) => {
-				if (err) return done(err, err);
+				if (err) return done(err, null);
 			})
 		})
 
 		//insert questions
-		_.forEach(event.questions, q => {
-			db.get().query('INSERT INTO event_question (event_id, question_id) VALUES (?, ?)', [id, q], (err, res) => {
-				if (err) return done(err, err);
+		_.forEach(event.topics, tID => {
+
+			//find random question for each topic
+			Question._getRandomQuestionByTopic(tID, (question, err) => {
+				db.get().query('INSERT INTO event_question (event_id, question_id) VALUES (?, ?)', [id, question[0].id], (err, res) => {
+					if (err) return done(err, null);
+				})
 			})
-		})*/
+			
+		})
 
 		return done(null, res.insertId)
 	})
@@ -57,4 +70,6 @@ function remove(id, done) {
 		return done(null, res)
 	});
 }
+
+
 

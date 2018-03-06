@@ -27,8 +27,11 @@ function getByID(req, res, next) {
 function create(req, res, next) {
 	event = {
 		created: moment().unix(),
+		updated: moment().unix(),
+		state: 'CREATED',
 		author: req.body.author,
-		competitors: req.body.competitors
+		competitors: req.body.competitors,
+		topics: req.body.topics
 	}
 	Event.create(event, (err, event) => {
 		if (err) {
