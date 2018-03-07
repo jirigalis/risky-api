@@ -22,7 +22,7 @@ db.connect(function (err) {
 app.set('superSecret', db.superSecret);
 
 // use parser so we can get info from POST and/or URL parameters
-app.use(express.json());
+app.use(express.json({limit: '50mb'}));
 app.use(express.urlencoded({ extended: true }));
 app.use(expressSanitizer());
 

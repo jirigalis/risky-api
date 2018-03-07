@@ -46,13 +46,14 @@ function create(event, done) {
 
 		//insert questions
 		_.forEach(event.topics, tID => {
-
-			//find random question for each topic
-			Question._getRandomQuestionByTopic(tID, (question, err) => {
-				db.get().query('INSERT INTO event_question (event_id, question_id) VALUES (?, ?)', [id, question[0].id], (err, res) => {
-					if (err) return done(err, null);
+			for (var i = 1; i <= event.questionCount; i++) {
+				//find random question for each topic
+				Question._getRandomQuestionByTopic(tID, i, (question, err) => {
+					db.get().query('INSERT INTO event_question (event_id, topic_id, question_id) VALUES (?, ?, ?)', [id, tID, question[0].id], (err, res) => {
+						if (err) return done(err, null);
+					})
 				})
-			})
+			}			
 			
 		})
 

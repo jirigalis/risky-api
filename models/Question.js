@@ -4,7 +4,7 @@ var errors = require('../helpers/errors');
 exports.create = (question, done) => {
 	var questionValues = [question.text, question.level, question.attachment];
 	db.get().query('INSERT INTO question (text, level, attachment) VALUES (?, ?, ?)', questionValues, (err, res) => {
-		if (err) throw err;
+		if (err) { return done(err, null)};
 		//handle topics
 		question.topics = _.map(question.topics, parseFloat)
 		for (var i = 0; i < question.topics.length; i++) {
@@ -102,9 +102,9 @@ async function fetchTopicsByQuestionID(qID) {
 	return _.map(topics, 'topic_id');
 }
 
-exports._getRandomQuestionByTopic = (tID, done) => {
+exports._getRandomQuestionByTopicLevel = (tID, level, done) => {
 	db.get().query('SELEcT q.id FROM question q INNER JOIN question_topic qt ON q.id=qt.question_id'+
-		' WHERE qt.topic_id = '+tID+' ORDER BY RAND() LIMIT 1', (err, question) => {
+		' WHERE qt.topic_id = '+tID+' AND q.level = '+level+' ORDER BY RAND() LIMIT 1', (err, question) => {
 			if (err) {
 				return done(null, err);
 			}
