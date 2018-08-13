@@ -6,6 +6,7 @@ var express = require('express')
 	, questions = require('./questions')
 	, events = require('./events')
 	, levels = require('./levels')
+	, answers = require('./answers')
 	, competitors = require('./competitors')
 	, auth = require('../middleware/auth')
 	, errorHandler = require('../middleware/errorHandler')
@@ -19,6 +20,7 @@ router.use('/topics', topics);
 router.use('/questions', questions);
 router.use('/events', events);
 router.use('/levels', levels);
+router.use('/answers', answers);
 router.use('/competitors', competitors);
 
 router.get('/', (req, res) => {

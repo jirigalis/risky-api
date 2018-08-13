@@ -11,12 +11,18 @@ router.get('/:id', getByID);
 router.get('/topic/:id', getAllByTopicID);
 router.get('/topic/:id/random', getRandomByTopic)
 router.get('/:id/topics', getTopics);
+router.get('/:id/attachment', getAttachment);
 router.put('/:id', update);
 
 module.exports = router
 
 function getAll(req, res) {
-	Question.getAll(function(err, questions)  {
+	let params = {
+		page: req.query.page,
+		limit: req.query.limit,
+		orderby: req.query.orderby
+	}
+	Question.getAll(params, function(err, questions)  {
 		res.json(questions);
 	});
 }
@@ -49,10 +55,22 @@ function create(req, res, next) {
 		text: req.sanitize(req.body.text),
 		level: req.body.level,
 		attachment: req.body.attachment,
-		topics: req.body.topics
+		topics: req.body.topics,
+		answer: req.body.answer
 	}
 	Question.create(question, (err, question) => {
-		res.json(question);
+		if (err) {
+			res.status(500);
+			res.json(err)
+		} else {
+			res.json(question);
+		}
+	})
+}
+
+function getAttachment(req, res, next) {
+	Question.getAttachmentByID(req.params.id, (err, attachment) => {
+		res.json(attachment);
 	})
 }
 
@@ -62,7 +80,8 @@ function update(req, res, next) {
 		text: req.sanitize(req.body.text),
 		level: req.body.level,
 		attachment: req.body.attachment,
-		topics: req.body.topics
+		topics: req.body.topics,
+		answer: req.body.answer
 	}
 	Question.update(question, (err, affectedRows) => {
 		res.json(affectedRows)

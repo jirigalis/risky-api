@@ -3,6 +3,7 @@ var Question = require('../models/Question');
 
 exports.getAll = getAll;
 exports.getByID = getByID;
+exports.play = play;
 exports.create = create;
 exports.remove = remove;
 
@@ -23,14 +24,16 @@ function getByID(id, done) {
 	})
 }
 
+/**
+ * Create new Risky Event
+ * 1. Create Event in database
+ * 
+ * @param {Event} event 
+ * @param {function} done 
+ */
 function create(event, done) {
 	var eventValues = [event.author, event.created, event.updated, event.state];
-	event.questions = [];
-
-	Question._getRandomQuestionByTopic(3, (question, err) => {
-		event.questions.push(question[0].id)
-	});
-		
+	event.questions = [];		
 
 	db.get().query('INSERT INTO event (author, created, updated, state) VALUES (?,?,?,?)', eventValues, (err, res) => {
 		if (err) return done(err, null);
@@ -48,7 +51,8 @@ function create(event, done) {
 		_.forEach(event.topics, tID => {
 			for (var i = 1; i <= event.questionCount; i++) {
 				//find random question for each topic
-				Question._getRandomQuestionByTopic(tID, i, (question, err) => {
+				Question.getRandomQuestionByTopicLevel(tID, i, (question, err) => {
+					console.log(question);
 					db.get().query('INSERT INTO event_question (event_id, topic_id, question_id) VALUES (?, ?, ?)', [id, tID, question[0].id], (err, res) => {
 						if (err) return done(err, null);
 					})
@@ -72,5 +76,43 @@ function remove(id, done) {
 	});
 }
 
+function play(id, done) {
+	db.get().query('SELECT * FROM event WHERE id='+id, async (err, event) => {
+		if (err) {
+			return done(err, null)
+		}
 
+		event = event[0];
 
+		let competitors = await fetchCompetitors(event.id);
+		let questions = await fetchQuestions(event.id);
+
+		event.competitors = competitors;
+		event.questions = questions;
+
+		return done(null, event);
+	})
+}
+
+async function fetchCompetitors(eID) {
+	let competitors  = await Promise.resolve(db.get().query('SELECT competitor_id FROM event_competitor WHERE event_id='+eID));
+	return _.map(competitors, 'competitor_id');
+}
+
+async function fetchQuestions(eID) {
+	let questions = await Promise.resolve(db.get().query('SELECT question_id FROM event_question WHERE event_id='+eID));
+
+	questions = _.map(questions, 'question_id');
+
+	_.map(questions, async q => {
+		let topics = await Promise.resolve(db.get().query('SELECT topic_id from question_topic WHERE question_id='+q));
+		q = {
+			topic: topics,
+			question: q
+		}
+	});
+
+	console.log(questions);
+
+	return questions;
+}

@@ -5,6 +5,7 @@ var Event = require('../models/Event')
 
 router.get('/', getAll);
 router.get('/:id', getByID);
+router.get('/:id/play', play);
 router.post('/new', create);
 router.delete('/:id', remove);
 router.put('/:id', update);
@@ -24,6 +25,12 @@ function getByID(req, res, next) {
 	});
 }
 
+function play(req, res, next) {
+	Event.play(req.params.id, (err, event) => {
+		res.json(event);
+	})
+}
+
 function create(req, res, next) {
 	event = {
 		created: moment().unix(),
@@ -31,7 +38,8 @@ function create(req, res, next) {
 		state: 'CREATED',
 		author: req.body.author,
 		competitors: req.body.competitors,
-		topics: req.body.topics
+		topics: req.body.topics,
+		questionCount: req.body.questionCount
 	}
 	Event.create(event, (err, event) => {
 		if (err) {
