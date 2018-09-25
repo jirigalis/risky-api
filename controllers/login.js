@@ -25,7 +25,7 @@ router.post('/login', (req, res) => {
 				};
 
 				var token = jwt.sign(payload, db.superSecret, {
-					expiresIn: '24h' //expires in 20 days
+					expiresIn: '24h' //expires in 24 hours
 				});
 
 				res.json({
