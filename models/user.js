@@ -1,7 +1,7 @@
 var db = require('../db.js');
 
-exports.create = function(userId, login, name, password, done) {
-	var values = [userId, login, name, password];
+exports.create = function(login, name, password, done) {
+	var values = [login, name, password];
 
 	db.get().query('INSERT INTO user (login, name, password) VALUES (?, ?, ?)', values, function (err, result) {
 		if (err) return done(err);

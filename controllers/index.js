@@ -13,9 +13,9 @@ var express = require('express')
 	;
 
 router.use(login);
+router.use('/users', users);
 
 router.use(auth);
-router.use('/users', users);
 router.use('/topics', topics);
 router.use('/questions', questions);
 router.use('/events', events);
