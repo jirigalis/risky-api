@@ -27,6 +27,9 @@ router.post('/login', (req, res) => {
 					expiresIn: '24h' //expires in 24 hours
 				});
 
+				//we don't want to send user's password back
+				delete us.password;
+
 				res.json({
 					success: true,
 					message: "Token is here",
