@@ -32,6 +32,7 @@ function createTopic(req, res, next) {
 	if (utils.isNullOrEmpty(newTopic.name)) {
 		next(errors.NULL_OR_EMPTY('name'));
 	} else {
+		//TODO: check if this name already exist
 		Topic.create(newTopic, (err, topic) => {
 			res.json(topic)
 		});
