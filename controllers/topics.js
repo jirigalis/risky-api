@@ -32,10 +32,18 @@ function createTopic(req, res, next) {
 	if (utils.isNullOrEmpty(newTopic.name)) {
 		next(errors.NULL_OR_EMPTY('name'));
 	} else {
-		//TODO: check if this name already exist
-		Topic.create(newTopic, (err, topic) => {
-			res.json(topic)
-		});
+		try {
+			//TODO: check if this name already exist
+			Topic.create(newTopic).then(newTopic => {
+				res.json(newTopic);
+			}).catch(err => {
+				next(err.sqlMessage);
+			})
+		} catch (err) {
+			console.log("ERR");
+			console.log(err);
+			next(err);
+		}
 	}
 }
 

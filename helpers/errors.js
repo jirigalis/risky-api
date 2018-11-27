@@ -8,6 +8,7 @@ var errors = {
 	},
 	WRONG_CREDENTIALS: 'The username or password is not correct. Try again.',
 	MISSING_CREDENTIALS: 'The username or password is missing. Try again.',
+	
 }
 
 module.exports = errors;
