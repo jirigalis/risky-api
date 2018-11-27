@@ -1,4 +1,5 @@
 var express = require('express')
+var errors = require('../helpers/errors');
 var router = express.Router()
 
 var Topic = require('../models/Topic')
@@ -32,18 +33,11 @@ function createTopic(req, res, next) {
 	if (utils.isNullOrEmpty(newTopic.name)) {
 		next(errors.NULL_OR_EMPTY('name'));
 	} else {
-		try {
-			//TODO: check if this name already exist
-			Topic.create(newTopic).then(newTopic => {
-				res.json(newTopic);
-			}).catch(err => {
-				next(err.sqlMessage);
-			})
-		} catch (err) {
-			console.log("ERR");
-			console.log(err);
+		Topic.create(newTopic).then(newTopic => {
+			res.json(newTopic);
+		}).catch(err => {
 			next(err);
-		}
+		})
 	}
 }
 

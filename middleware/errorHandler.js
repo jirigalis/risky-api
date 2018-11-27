@@ -4,7 +4,12 @@ var express = require('express')
 	;
 
 function generalErrorHandler(err, req, res, next) {
+	console.log("================================================")
 	console.log(err)
+	console.log("================================================")
+
+	
+
 	res.status(500).send(errors.UNEXPECTED)
 }
 

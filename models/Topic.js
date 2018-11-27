@@ -1,26 +1,8 @@
 var db = require('../db.js');
 
-/*exports.create = function(topic, done) {
-	var values = [topic.name, topic.description];
-	db.get().query('INSERT INTO topic (name, description) VALUES (?, ?)', values, function (err, result) {
-		if (err) {
-			console.log("Error in Topic.js");
-			throw new Error(err);
-		} else {
-			done(null, result.insertId)
-		}
-	});
-}*/
-
 exports.create = (topic) => {
     var values = [topic.name, topic.description, topic.img];
-    try {
-    	return db.get().query('INSERT INTO topic (name, description, img) VALUES (?, ?, ?)', values);
-    } catch (err) {
-    	console.log("ERROR in Topic.js");
-    	console.log(err);
-    	return next(err);
-    }
+	return db.get().query('INSERT INTO topic (name, description, img) VALUES (?, ?, ?)', values);
 }
 
 exports.getAll = function(done) {
