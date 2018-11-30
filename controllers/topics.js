@@ -5,11 +5,14 @@ var router = express.Router()
 var Topic = require('../models/Topic')
 
 router.get('/', function (req, res) {
-	Topic.getAll(function(err, us)  {
-		res.json(us);
+	Topic.getAll().then(result => {
+		res.json(result);
+	}).catch(err => {
+		next(err)
 	});
 })
 
+router.get('/stats', getAllWithStats);
 router.get('/:id', getById);
 router.get('/question/:id', getByQuestionId);
 router.post('/new', createTopic);
@@ -17,6 +20,14 @@ router.put('/:id', updateTopic);
 router.delete('/delete/:id', deleteTopic);
 
 module.exports = router;
+
+function getAllWithStats(req, res, next) {
+	Topic.getAllWithStats().then(topics => {
+		res.json(topics);
+	}).catch(err => {
+		next(err)
+	});
+}
 
 function getById(req, res, next) {
 	Topic.getByID(req.params.id, (err, topic) => {
@@ -33,10 +44,17 @@ function createTopic(req, res, next) {
 	if (utils.isNullOrEmpty(newTopic.name)) {
 		next(errors.NULL_OR_EMPTY('name'));
 	} else {
-		Topic.create(newTopic).then(newTopic => {
-			res.json(newTopic);
-		}).catch(err => {
-			next(err);
+		//Check if topic with current name already exists
+		Topic.getByName(newTopic.name).then(results => {
+			if(_.isEmpty(results)) {
+				Topic.create(newTopic).then(newTopic => {
+					res.json(newTopic);
+				}).catch(err => {
+					next(err);
+				})				
+			} else {
+				next(errors.DUPLICATE_ENTRY("name", newTopic.name))
+			}
 		})
 	}
 }

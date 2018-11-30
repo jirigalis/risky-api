@@ -5,18 +5,18 @@ exports.create = (topic) => {
 	return db.get().query('INSERT INTO topic (name, description, img) VALUES (?, ?, ?)', values);
 }
 
-exports.getAll = function(done) {
-    db.get().query('SELECT * FROM topic ORDER BY name', function(err, rows) {
-        if (err) throw err;
-        done(null, rows);
-    });
+exports.getAll = function() {
+    return db.get().query('SELECT id, name, description, convert(img using utf8) as img FROM topic ORDER BY name');
 }
 
-exports.getByName = (name, done) => {
-    db.get().query('SELECT * FROM topic WHERE name like "%' + name + '%"', (err, rows) => {
-        if (err) throw err;
-        done(null, rows);
-    });
+exports.getAllWithStats = function() {
+	return db.get().query(
+		'select t.id, t.name, t.description, t.status, convert(t.img using utf8) as img, count(qt.question_id) as question_count from topic t left join question_topic qt on t.id =qt.topic_id group by t.id'
+	);
+}
+
+exports.getByName = (name) => {
+    return db.get().query('SELECT * FROM topic WHERE name like "%' + name + '%"');
 }
 
 exports.getByID = (id, done) => {
