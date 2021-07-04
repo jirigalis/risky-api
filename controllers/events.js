@@ -38,7 +38,7 @@ function create(req, res, next) {
 		state: 'CREATED',
 		author: req.body.author,
 		competitors: req.body.competitors,
-		topics: req.body.topics,
+		categories: req.body.categories,
 		questionCount: req.body.questionCount
 	}
 	Event.create(event, (err, event) => {

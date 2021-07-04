@@ -9,8 +9,8 @@ function generalErrorHandler(err, req, res, next) {
 	console.log("================================================")
 
 	//error is already handled:
-	if (typeof err === 'string' && _.startsWith(err, "Error: ")) {
-		return res.status(500).send(err);
+	if (typeof err === 'object' && typeof err.code !== 'undefined') {
+		return res.status(err.code).send(err.msg);
 	}
 
 	//check DB error
@@ -30,7 +30,10 @@ function handleDatabaseError(err, req, res, next) {
 
 	switch (errCode) {
 		case "ER_DUP_ENTRY": {
-			return res.status(500).send(err.sqlMessage);
+			return res.status(409).send(err.sqlMessage);
+		}
+		case "ER_BAD_NULL_ERROR": {
+			return res.status(400).send(err.sqlMessage);
 		}
 		default: {
 			return res.status(500).send(errors.UNEXPECTED_DATABASE);

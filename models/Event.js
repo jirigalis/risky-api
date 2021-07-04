@@ -48,12 +48,12 @@ function create(event, done) {
 		})
 
 		//insert questions
-		_.forEach(event.topics, tID => {
+		_.forEach(event.categories, tID => {
 			for (var i = 1; i <= event.questionCount; i++) {
-				//find random question for each topic
-				Question.getRandomQuestionByTopicLevel(tID, i, (question, err) => {
+				//find random question for each category
+				Question.getRandomQuestionByCategoryLevel(tID, i, (question, err) => {
 					console.log(question);
-					db.get().query('INSERT INTO event_question (event_id, topic_id, question_id) VALUES (?, ?, ?)', [id, tID, question[0].id], (err, res) => {
+					db.get().query('INSERT INTO event_question (event_id, category_id, question_id) VALUES (?, ?, ?)', [id, tID, question[0].id], (err, res) => {
 						if (err) return done(err, null);
 					})
 				})
@@ -105,9 +105,9 @@ async function fetchQuestions(eID) {
 	questions = _.map(questions, 'question_id');
 
 	_.map(questions, async q => {
-		let topics = await Promise.resolve(db.get().query('SELECT topic_id from question_topic WHERE question_id='+q));
+		let categories = await Promise.resolve(db.get().query('SELECT category_id from question_category WHERE question_id='+q));
 		q = {
-			topic: topics,
+			category: categories,
 			question: q
 		}
 	});

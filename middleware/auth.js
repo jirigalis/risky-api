@@ -4,9 +4,9 @@ var jwt = require('jsonwebtoken');
 var User = require('../models/user');
 
 module.exports = function(req, res, next) {
-	var token = req.token || req.token || req.headers['x-access-token'];
+	var token = req.token || req.headers['x-access-token'];
 	if (token) {
-		jwt.verify(token, 'ilovescotchyscotch', function(err, decoded) {
+		jwt.verify(token, process.env.secret, function(err, decoded) {
 			if (err) {
 				res.status(401);
 				return res.json({success: false, message: 'Failed to authenticate token.'});

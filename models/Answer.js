@@ -1,4 +1,4 @@
-var db = require('../db.js');
+const db = require('../db.js');
 
 exports.getAll = getAll;
 exports.getByID = getByID;
@@ -8,23 +8,23 @@ exports.update = update;
 exports.remove = remove;
 
 function getAll(done) {
-    db.get().query('SELECT * FROM answer', (err, answers) => {
+    db.get().query('SELECT * FROM answer ORDER BY text', (err, answers) => {
         if (err) {
-            return done(err, null);
+            done(err, null);
         }
-        return done(null, answers)
+        done(null, answers)
     })
 }
 
 function getByID(id, done) {
     db.get().query('SELECT * FROM answer WHERE id='+id, (err, answer) => {
         if (err) {
-            return done(err, null);
+            done(err, null);
         }
         if (answer.length == 0) {
-            return done(null, errors.ID_NOT_FOUND(id))
+            done(null, errors.ID_NOT_FOUND(id))
         }
-        return done(null, answer[0])
+        done(null, answer[0])
     })
 }
 
@@ -41,9 +41,9 @@ function create(answer, done) {
     var answerValues = [answer.question_id, answer.text];
     db.get().query('INSERT INTO answer (question_id, text) VALUES (?, ?)', answerValues, (err, res) => {
         if (err) {
-            return done(err, null)
+            done(err, null)
         }
-        return done(null, res.isertId);
+        done(null, res.insertId);
     })
 }
 

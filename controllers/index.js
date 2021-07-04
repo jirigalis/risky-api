@@ -2,7 +2,8 @@ var express = require('express')
 	, router = express.Router()
 	, login = require('./login')
 	, users = require('./users')
-	, topics = require('./topics')
+	, categories = require('./categories')
+	, items = require('./items')
 	, questions = require('./questions')
 	, events = require('./events')
 	, levels = require('./levels')
@@ -16,7 +17,8 @@ router.use(login);
 router.use('/users', users);
 
 router.use(auth);
-router.use('/topics', topics);
+router.use('/categories', categories);
+router.use('/items', items);
 router.use('/questions', questions);
 router.use('/events', events);
 router.use('/levels', levels)

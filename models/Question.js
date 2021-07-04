@@ -1,14 +1,15 @@
-var db = require('../db.js');
-var errors = require('../helpers/errors');
+const db = require('../db.js');
+const errors = require('../helpers/errors');
+const async = require('async');
 
 exports.create = (question, done) => {
-	var questionValues = [question.text, question.level, question.attachment];
+	const questionValues = [question.text, question.level, question.attachment];
 	db.get().query('INSERT INTO question (text, level, attachment) VALUES (?, ?, ?)', questionValues, (err, res) => {
 		if (err) { return done(err, null)};
-		//handle topics
-		question.topics = _.map(question.topics, parseFloat)
-		for (var i = 0; i < question.topics.length; i++) {
-			db.get().query('INSERT INTO question_topic VALUES ('+res.insertId+', '+question.topics[i]+')', (err, res) => {
+		//handle categories
+		question.categories = _.map(question.categories, 'id')
+		for (let i = 0; i < question.categories.length; i++) {
+			db.get().query('INSERT INTO question_category VALUES ('+res.insertId+', '+question.categories[i]+')', (err, res) => {
 				if (err) {
 					return done(err, null);
 				}
@@ -16,7 +17,7 @@ exports.create = (question, done) => {
 		}
 
 		//add answer
-		if (typeof question.answer !== undefined && question.answer !== "") {
+		if (typeof question.answer !== 'undefined' && !_.isEmpty(question.answer)) {
 			db.get().query('INSERT INTO answer (question_id, text) VALUES (?, ?)', [res.insertId, question.answer], (err, res) => {
 				if (err) {
 					return done(err, null);
@@ -24,142 +25,258 @@ exports.create = (question, done) => {
 			});
 		}
 
+		//handle ANSWER
+		//if the answer is String => insert new answer
+		if (typeof question.answer === 'string' && question.answer !== '') {
+			db.get().query('INSERT INTO answer (text) VALUES (?)', [question.answer], (err, res) => {
+				if (err) {
+					return done(err, null)
+				}
+				db.get().query('INSERT INTO question_answer (question_id, answer_id) VALUES (?,?)',
+					[question.id, res.insertId], (err, res) => { if (err) { return done(err, null) }})
+			});
+		}
+		else if (typeof question.answer === 'number') {
+			db.get().query('INSERT INTO question_answer (question_id, answer_id) VALUES (?,?)',
+					[res.insertId, question.answer], (err, res) => { if (err) {return done (err, null) }})
+		}
+
 		return done(null, res.insertId)
 	});
-}
+};
 
 exports.update = (question, done) => {
-	var values = [question.text, question.level, question.attachment, question.id];
+	const values = [question.text, question.level, question.attachment, question.id];
 	db.get().query('UPDATE question SET text = ?, level = ?, attachment = ? WHERE id = ?', values, async (err, res) => {
 		if (err) throw err;
 		if (res.affectedRows > 0) {
-			let oldTopics = await fetchTopicsByQuestionID(question.id);
-			question.topics = _.map(question.topics, parseFloat)
-			if (!_.isEqual(oldTopics.sort(), question.topics.sort())) {
-				db.get().query('DELETE FROM question_topic WHERE question_id='+question.id);
-				//TODO: find out why some ids are not added sometimes.
-				//edit: at first edit topics are cleared
-				for (var i = 0; i < question.topics.length; i++) {
-					db.get().query('INSERT INTO question_topic VALUES ('+question.id+', '+question.topics[i]+')');
-				}
-			}
+			const oldCategories = [];
 
-			//update answer
-			let oldAnswer = await fetchAnswerByQuestionID(question.id);
-			if (_.isEmpty(oldAnswer)) {
-				db.get().query('INSERT INTO answer (question_id, text) VALUES (?,?)', [question.id, question.answer], (err, res) => {
-					if (err) {
-						return done(err, null);
+			await Promise.resolve(getCategoriesbyQuestionIDPromise(question.id))
+			.then(result => {
+				_.each(result, r => {
+					oldCategories.push(r.id);
+				});
+				question.categories = _.map(question.categories, 'id');
+			})
+			
+			// question.categories = _.map(question.categories, 'id');
+			if (!_.isEqual(oldCategories.sort(), question.categories.sort())) {
+				db.get().query('DELETE FROM question_category WHERE question_id=' + question.id, (res) => {
+					for (let i = 0; i < question.categories.length; i++) {
+						db.get().query('INSERT INTO question_category VALUES ('+question.id+', '+question.categories[i]+')');
 					}
+				});				
+			}
+			
+			//handle ANSWER
+			//if the answer is String => insert new answer
+			if (typeof question.answer === 'string' && question.answer !== '') {
+				db.get().query('INSERT INTO answer (text) VALUES (?)', [question.answer], (err, res) => {
+					if (err) {
+						return done(err, null)
+					}
+					db.get().query('INSERT INTO question_answer (question_id, answer_id) VALUES (?,?)',
+						[question.id, res.insertId], (err, res) => { if (err) { return done(err, null) }})
 				});
 			}
-			if (!_.isEqual(oldAnswer, question.answer)) {
-				db.get().query('UPDATE answer SET text = ? WHERE question_id = ?', [question.answer, question.id])
+			else if (typeof question.answer === 'number') {
+				await Promise.resolve(getAnswersByQuestionIDPromise(question.id))
+				.then(result => {
+					_.each(result, r => {
+						oldCategories.push(r.id);
+					});
+					question.categories = _.map(question.categories, 'id');
+				})
+				
+				let oldAnswer = '';
+				await Promise.resolve(getAnswersByQuestionIDPromise(question.id))
+				.then(result => {
+					oldAnswer = result;
+					console.log(result);
+				})
+				/*if (_.isEmpty(oldAnswer)) {
+					db.get().query('INSERT INTO question_answer (answer_id) VALUES (?)',
+						[question.id, question.answer], (err, res) => { if (err) {return done (err, null) }})
+				}
+				else if (oldAnswer.indexOf(question.id) < 0) {
+					db.get().query('UPDATE question_answer SET answer_id = ? WHERE question_id = ?',
+						[question.answer, question.id], (err, res) => {
+							if (err) {
+								return done(err, null);
+							}
+						});
+				}*/
 			}
 		}
 		return done(null, res.affectedRows);
 	});
 }
 
-exports.getAll = async (params, done) => {
-	const offset = params.page * params.limit;
-	db.get().query('SELECT q.id, q.text, q.level, a.text as answer FROM `question` q LEFT JOIN answer a on q.id = a.question_id', async (err, questions) => {
-		if (err) throw err;
-		for (let question of questions) {
-			const topics = await fetchTopicsByQuestionID(question.id);
-			question.topics = topics
+exports.delete = (id, done) => {
+	db.get().query('DELETE FROM question WHERE id=?', [id], (err, result) => {
+		if (err) {
+			done(err, null)
 		}
-		return done(null, questions)
+		done(null, result.affectedRows);
 	})
+}
+
+exports.getAll = async (params, done) => {
+	db.get().query('SELECT q.id, q.text, q.level, q.status, a.text as answer, IF(q.attachment IS NULL OR q.attachment = \'\', 0, 1) as attachment FROM question q LEFT JOIN question_answer qa ON q.id = qa.question_id ' +
+		'LEFT JOIN answer a on qa.answer_id = a.id', (err, questions) => {
+			if (err) done(err);
+			else done(null, questions);
+		})
 }
 
 exports.getByID = (qID, done) => {
-	db.get().query('SELECT q.*, a.text as answer FROM question q LEFT JOIN answer a on q.id=a.question_id WHERE q.id='+qID, async (err, questions) => {
+	db.get().query('SELECT q.*, qa.answer_id as answer FROM question q LEFT JOIN question_answer qa on q.id=qa.question_id WHERE q.id='+qID, async (err, questions) => {
 		if (err) throw err;
 		if (questions.length === 0) {
-			return done(null, errors.ID_NOT_FOUND(qID));
+			done(null, errors.ID_NOT_FOUND(qID));
 		}
-		const topics = await fetchTopicsByQuestionID(questions[0].id);
-		questions[0].topics = topics;
-		return done(null, questions[0]);
+		done(null, questions[0]);
 	})
-}
+};
 
-exports.getAllByTopicID = (tID, done) => {
-	db.get().query('SELEcT q.* FROM question q INNER JOIN question_topic qt ON q.id=qt.question_id WHERE qt.topic_id='+tID+
+exports.getAllByCategory = (categoryId, done) => {
+	db.get().query('SELEcT q.* FROM question q INNER JOIN question_category qt ON q.id=qt.question_id WHERE qt.category_id='+categoryId+
 		' GROUP BY q.id', async (err, questions) => {
 			if (err) throw err;
 			if (questions.length === 0) {
-				return done(null, errors.ID_NOT_FOUND(tID));
+				done(null, errors.ID_NOT_FOUND(categoryId));
 			}
 
 			for (let question of questions) {
-				const topics = await fetchTopicsByQuestionID(question.id);
-				question.topics = topics;
+				await Promise.resolve(getCategoriesbyQuestionIDPromise(question.id))
+				.then(result => {
+					question.categories = result;
+				})
 			}
-			return done(null, questions);
+			done(null, questions);
 		});
-}
+};
 
-exports.getRandomByTopic = (tID, done) => {
-	db.get().query('SELEcT q.* FROM question q INNER JOIN question_topic qt ON q.id=qt.question_id'+
-		' WHERE qt.topic_id = '+tID+' ORDER BY RAND() LIMIT 1', async (err, question) => {
+exports.getRandomByCategory = (categoryId, done) => {
+	db.get().query('SELEcT q.* FROM question q INNER JOIN question_category qt ON q.id=qt.question_id'+
+		' WHERE qt.category_id = '+ categoryId +' ORDER BY RAND() LIMIT 1', async (err, question) => {
 			if (err) throw err;
 			if (question.length === 0) {
-				return done(null, errors.ID_NOT_FOUND(tID));
+				done(null, errors.ID_NOT_FOUND(categoryId));
 			}
 
-			const topics = await fetchTopicsByQuestionID(question[0].id);
-			question[0].topics = topics;
-			return done(null, question[0]);
-		})
-}
+			const categories = [];
+			await Promise.resolve(getCategoriesbyQuestionIDPromise(question[0].id))
+			.then(result => {
+				categories = result;
+			})
 
-exports.getTopics = (qID, done) => {
-	db.get().query('SELECT * from topic WHERE id in (SELECT topic_id FROM question_topic'+
-		' WHERE question_id='+qID+')', (err, topics) => {
+			question[0].categories = categories;
+			done(null, question[0]);
+		})
+};
+
+exports.getCategoriesForQuestion = (qID, done) => {
+	db.get().query('SELECT * from category WHERE id in (SELECT category_id FROM question_category'+
+		' WHERE question_id='+qID+')', (err, categories) => {
 			if (err) throw err;
-			if (topics.length === 0) {
-				return done(null, errors.ID_NOT_FOUND(qID));
+			if (categories.length === 0) {
+				done(null, errors.ID_NOT_FOUND(qID));
 			}
-			return done(null, topics);
+			done(null, categories);
 		})
-}
+};
 
-exports.getRandomQuestionByTopicLevel = (tID, level, done) => {
-	db.get().query('SELEcT q.id FROM question q INNER JOIN question_topic qt ON q.id=qt.question_id'+
-		' WHERE qt.topic_id = '+tID+' AND q.level = '+level+' ORDER BY RAND() LIMIT 1', (err, question) => {
-			console.log(question);
-			console.log("question");
+exports.getRandomQuestionByCategoryLevel = (tID, level, done) => {
+	db.get().query('SELEcT q.id FROM question q INNER JOIN question_category qt ON q.id=qt.question_id'+
+		' WHERE qt.category_id = '+tID+' AND q.level = '+level+' ORDER BY RAND() LIMIT 1', (err, question) => {
 			if (err) {
-				return done(null, err);
+				done(null, err);
 			}
 			else {
-				return done(question, null);
+				done(question, null);
 			}
 		})
-}
+};
 
 exports.getAttachmentByID = (qID, done) => {
 	db.get().query('SELECT attachment FROM question WHERE id = '+qID, (err, attachment) => {
 		if (err) {
-			return done(err, err);
+			done(err, err);
 		}
-		else if (attachment.length == 0) {
-			return done(null, errors.ID_NOT_FOUND(qID));
+		else if (attachment.length === 0) {
+			done(null, errors.ID_NOT_FOUND(qID));
 		}
 		else {
-			return done(null, attachment);
+			done(null, attachment);
 		}
 	})
+};
+
+exports.setQuestionStatus = (id, status, done) => {
+	db.get().query('UPDATE question SET status = ? WHERE id = ?', [status, id], (err, result) => {
+		if (err) {
+			return done(err, null);
+		}
+		done(null, {id: id, status: status})
+	})
+};
+
+exports.getByIdWithCategories = (id, done) => {
+	db.get().query('SELECT * FROM question WHERE id = ?', id, async (err, question) => {
+		if (err) done(err);
+
+		question = question[0];
+		
+		await Promise.resolve(getCategoriesbyQuestionIDPromise(question.id))
+			.then(result => {
+				question.categories = result;
+			})
+		done(null, question);
+	});
 }
 
-async function fetchTopicsByQuestionID(qID) {
-	let topics = await Promise.resolve(db.get().query('SELECT topic_id from question_topic WHERE question_id='+qID));
-	return _.map(topics, 'topic_id');
+function getCategoriesbyQuestionIDPromise(id) {
+	const sql = 'SELECT qt.category_id as id, t.name, qt.question_id as question_id '
+				+ 'FROM question_category qt LEFT JOIN category t '
+		+ 'ON qt.category_ID = t.id WHERE question_id=' + id;
+	return db.fetchResult(sql);
 }
 
-async function fetchAnswerByQuestionID(qID) {
-	let answer  = await Promise.resolve(db.get().query('SELECT text FROM answer WHERE question_id='+qID));
-	return answer;
+function getAnswersByQuestionIDPromise(id) {
+	const sql = 'SELECT answer_id FROM question_answer WHERE question_id=' + id;
+	return db.fetchResult(sql);
+}
+
+exports.getAllWithCategories = done => {
+	db.get().query('SELECT * FROM question', async (err, questions, fields) => {
+		if (err) done(err);
+		
+		// get category promise for each question
+		let categories = [];
+		_.each(questions, q => {
+			categories.push(getCategoriesbyQuestionIDPromise(q.id));
+		})
+		
+		// wait for promises to be resolved
+		await Promise.all(categories)
+			.then((results) => {
+				_.each(results, r => {
+					if (r.length > 0) {
+						const qIndex = _.findIndex(questions, (q) => {
+							return q.id === r[0].question_id
+						});
+						if (qIndex >= 0) {
+							questions[qIndex].categories = r;
+						}
+					}
+				})
+			})
+			.catch(errPromises => {
+				console.log('ERROR IN PROMISES', errPromises);
+			})
+
+		done(null, questions);
+	})
 }

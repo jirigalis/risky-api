@@ -1,25 +1,20 @@
+require('dotenv').config();
 global._ = require('lodash');
 global.moment = require('moment');
 global.errors = require('./helpers/errors');
 global.utils = require('./helpers/utils');
 
 const express = require('express')
-const app = express()
-var db = require('./db')
-var morgan = require('morgan');
-var routes = require('./controllers/index');
-var expressSanitizer = require('express-sanitizer');
+const app = express();
+const routes = require('./controllers/index');
+const expressSanitizer = require('express-sanitizer');
+const winston = require('winston'),
+    expressWinston = require('express-winston');
+const appRoot = require('app-root-path');
+const logger = require('./logger');
 
-db.connect(function (err) {
-	if (err) {
-		console.log('Unable to connect to database.');
-		console.log(err);
-		process.exit(1);
-	} else {
-	}
-})
 //set super secret
-app.set('superSecret', db.superSecret);
+app.set('superSecret', process.env.secret);
 
 // use parser so we can get info from POST and/or URL parameters
 app.use(express.json({limit: '50mb'}));
@@ -27,7 +22,11 @@ app.use(express.urlencoded({ extended: true }));
 app.use(expressSanitizer());
 
 //log request
-app.use(morgan('dev'));
+app.use(logger.appLogger);
+app.use(logger.errLogger);
+
+//static files
+app.use('*/public', express.static('public'));
 
 //routing
 app.use(routes);

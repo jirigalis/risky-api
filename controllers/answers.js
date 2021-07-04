@@ -1,7 +1,7 @@
-var express = require('express');
-var router = express.Router();
+const express = require('express');
+const router = express.Router();
 
-var Answer = require('../models/Answer');
+const Answer = require('../models/Answer');
 
 router.get('/', getAll);
 router.get('/:id', getByID);
@@ -14,6 +14,9 @@ module.exports = router;
 
 function getAll(req, res) {
     Answer.getAll((err, answers) => {
+        if (err) {
+            next(err);
+        }
         res.json(answers);
     })
 }
@@ -71,7 +74,6 @@ function update(req, res, next) {
 function remove(req, res, next) {
     Answer.delete(req.params.id, (err, deleted) => {
         if (err) {
-            res.status(500);
             next(err);
         }
         res.json(deleted)
