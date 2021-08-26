@@ -1,5 +1,3 @@
 node_modules/
 log/
-./db.js
-db.js
 dump-risky.sql
