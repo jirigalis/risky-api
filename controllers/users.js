@@ -11,6 +11,7 @@ const { body, validationResult } = require('express-validator');
 
 router.get('/', (req, res) => {
 	User.getAllWithRoles(function(err, us)  {
+		console.log("DEBUG: get all users");
 		res.json(us);
 	});
 })
@@ -32,6 +33,8 @@ function getById(req, res, next) {
 function createUser(req, res, next) {
 	let newUser = req.body;
 	newUser.email = req.sanitize(newUser.email);
+
+	console.log(newUser);
 
 	if (utils.isNullOrEmpty(newUser.email)) {
 		next(errors.NULL_OR_EMPTY('e-mail'))

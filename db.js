@@ -27,7 +27,7 @@ exports.connect = connection;
 /**
  * The global function for fetching SQL results as promises. Don't forget to use Promise.all
  * function with the await keyword to fetch all results properly. The SQL query should select 
- * also the "pairing" column to properly assing results to the parent query.
+ * also the "pairing" column to properly assign results to the parent query.
  * 
  * @param {String} sql the SQL query
  */

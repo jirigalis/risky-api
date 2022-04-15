@@ -73,6 +73,8 @@ function create(req, res, next) {
         } else {
             const tmpItemPath = TMP_FILE_PATH + newItem.file.filename;
             const newItemPath = UPLOADS_PATH + newItem.categories[0].id + '/';
+
+            console.log("Item paths", tmpItemPath, newItemPath);
             
             if (!fs.existsSync(newItemPath)) {
                 fs.mkdir(newItemPath, { recursive: true }, (err) => {
